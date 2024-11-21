@@ -1,6 +1,6 @@
 import { promises as fs } from "fs"
 import core from "@actions/core"
-import { GitHub, context } from "@actions/github"
+import * as github from "@actions/github"
 import path from "path"
 
 import { parse } from "./lcov"
@@ -10,10 +10,11 @@ import { deleteOldComments } from "./delete_old_comments"
 import { normalisePath } from "./util"
 
 const MAX_COMMENT_CHARS = 65536
+const context = github.context
 
 async function main() {
 	const token = core.getInput("github-token")
-	const githubClient = new GitHub(token)
+	const githubClient = github.getOctokit(token)
 	const workingDir = core.getInput("working-directory") || "./"
 	const lcovFile = path.join(
 		workingDir,
