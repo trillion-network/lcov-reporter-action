@@ -9,12 +9,11 @@ export async function getChangedFiles(githubClient, options, context) {
 	}
 
 	// Use GitHub's compare two commits API.
-	// https://developer.github.com/v3/repos/commits/#compare-two-commits
-	const response = await githubClient.repos.compareCommits({
-		base: options.baseCommit,
-		head: options.commit,
+	// https://octokit.github.io/rest.js/v21/#repos-compare-commits-with-basehead
+	const response = await githubClient.rest.repos.compareCommitsWithBasehead({
 		owner: context.repo.owner,
 		repo: context.repo.repo,
+		basehead: `${options.baseCommit}...${options.commit}`,
 	})
 
 	if (response.status !== 200) {
@@ -23,6 +22,7 @@ export async function getChangedFiles(githubClient, options, context) {
 		)
 	}
 
+	// https://docs.github.com/en/rest/commits/commits?apiVersion=2022-11-28#compare-two-commits
 	return response.data.files
 		.filter(file => file.status == "modified" || file.status == "added")
 		.map(file => file.filename)
