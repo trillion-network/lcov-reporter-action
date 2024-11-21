@@ -69,7 +69,6 @@ async function main() {
 	const lcov = await parse(raw)
 	const baselcov = baseRaw && (await parse(baseRaw))
 	const body = diff(lcov, baselcov, options).substring(0, MAX_COMMENT_CHARS)
-
 	if (
 		context.eventName === "pull_request" ||
 		context.eventName === "pull_request_target"
@@ -77,14 +76,14 @@ async function main() {
 		if (shouldDeleteOldComments) {
 			await deleteOldComments(githubClient, options, context)
 		}
-		await githubClient.issues.createComment({
+		await githubClient.rest.issues.createComment({
 			repo: context.repo.repo,
 			owner: context.repo.owner,
 			issue_number: context.payload.pull_request.number,
 			body: body,
 		})
 	} else if (context.eventName === "push") {
-		await githubClient.repos.createCommitComment({
+		await githubClient.rest.repos.createCommitComment({
 			repo: context.repo.repo,
 			owner: context.repo.owner,
 			commit_sha: options.commit,
