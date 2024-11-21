@@ -46,13 +46,13 @@ If included, will be added as a title for the comment produced.
 ## Example usage
 
 ```yml
-uses: romeovs/lcov-reporter-action@v0.3.1
+uses: trillion-network/lcov-reporter-action@v0.2.0
 with:
   lcov-file: ./coverage/lcov.info
 ```
 
 ## Acknowledgements
 
-The initial code is based on [ziishaned/jest-reporter-action](https://github.com/ziishaned/jest-reporter-action).
+The initial code is based on [ziishaned/jest-reporter-action](https://github.com/ziishaned/jest-reporter-action) and [romeovs/lcov-reporter-action](https://github.com/romeovs/lcov-reporter-action).
 
 Changed file retrieval based on [jitterbit/get-changed-files](https://github.com/jitterbit/get-changed-files).
