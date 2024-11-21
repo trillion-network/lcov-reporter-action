@@ -46,7 +46,7 @@ If included, will be added as a title for the comment produced.
 ## Example usage
 
 ```yml
-uses: trillion-network/lcov-reporter-action@v0.3.1
+uses: trillion-network/lcov-reporter-action@v0.4.0
 with:
   lcov-file: ./coverage/lcov.info
 ```
