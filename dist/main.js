@@ -31963,12 +31963,11 @@ async function getChangedFiles(githubClient, options, context) {
 	}
 
 	// Use GitHub's compare two commits API.
-	// https://developer.github.com/v3/repos/commits/#compare-two-commits
-	const response = await githubClient.repos.compareCommits({
-		base: options.baseCommit,
-		head: options.commit,
+	// https://octokit.github.io/rest.js/v21/#repos-compare-commits-with-basehead
+	const response = await githubClient.rest.repos.compareCommitsWithBasehead({
 		owner: context.repo.owner,
 		repo: context.repo.repo,
+		basehead: `${options.baseCommit}...${options.commit}`,
 	});
 
 	if (response.status !== 200) {
@@ -31977,6 +31976,7 @@ async function getChangedFiles(githubClient, options, context) {
 		);
 	}
 
+	// https://docs.github.com/en/rest/commits/commits?apiVersion=2022-11-28#compare-two-commits
 	return response.data.files
 		.filter(file => file.status == "modified" || file.status == "added")
 		.map(file => file.filename)
@@ -31989,7 +31989,7 @@ async function deleteOldComments(github, options, context) {
 	for (const comment of existingComments) {
 		coreExports.debug(`Deleting comment: ${comment.id}`);
 		try {
-			await github.issues.deleteComment({
+			await github.rest.issues.deleteComment({
 				owner: context.repo.owner,
 				repo: context.repo.repo,
 				comment_id: comment.id,
@@ -32005,7 +32005,7 @@ async function getExistingComments(github, options, context) {
 	let results = [];
 	let response;
 	do {
-		response = await github.issues.listComments({
+		response = await github.rest.issues.listComments({
 			issue_number: context.issue.number,
 			owner: context.repo.owner,
 			repo: context.repo.repo,
@@ -32084,7 +32084,6 @@ async function main() {
 	const lcov = await parse(raw);
 	const baselcov = baseRaw && (await parse(baseRaw));
 	const body = diff(lcov, baselcov, options).substring(0, MAX_COMMENT_CHARS);
-
 	if (
 		context.eventName === "pull_request" ||
 		context.eventName === "pull_request_target"
@@ -32092,14 +32091,14 @@ async function main() {
 		if (shouldDeleteOldComments) {
 			await deleteOldComments(githubClient, options, context);
 		}
-		await githubClient.issues.createComment({
+		await githubClient.rest.issues.createComment({
 			repo: context.repo.repo,
 			owner: context.repo.owner,
 			issue_number: context.payload.pull_request.number,
 			body: body,
 		});
 	} else if (context.eventName === "push") {
-		await githubClient.repos.createCommitComment({
+		await githubClient.rest.repos.createCommitComment({
 			repo: context.repo.repo,
 			owner: context.repo.owner,
 			commit_sha: options.commit,
